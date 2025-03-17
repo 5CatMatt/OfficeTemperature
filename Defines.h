@@ -3,6 +3,8 @@
 
 #define SDA 23
 #define SCL 22
+#define RST 33
+#define INT 32
 
 // Pages to display, creates navigation via switch
 const uint8_t pageBlueRing = 0;

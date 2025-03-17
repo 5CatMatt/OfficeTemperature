@@ -20,7 +20,7 @@ TFT_eSprite centerText = TFT_eSprite(&tft);
 
 // Touchscreen
 #include <CST816S.h>
-CST816S touch(SDA, SCL, 33, 32);	// SDA, SCL, RST, INT
+CST816S touch(SDA, SCL, RST, INT);
 
 void setup() {
   Serial.begin(115200);
