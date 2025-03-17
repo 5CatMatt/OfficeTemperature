@@ -27,7 +27,7 @@ void setup() {
 
   // setup GPIO
   pinMode(powerEnable, OUTPUT);
-  digitalWrite(powerEnable, HIGH);  // LOW state disabled the esp32 EN pin resulting in full shutdown - TODO wakeup not supported yet
+  digitalWrite(powerEnable, HIGH);  // LOW state disables the esp32 EN pin resulting in full shutdown - TODO wakeup not supported yet
 
   pinMode(motionSensePin, INPUT);
 
