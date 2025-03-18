@@ -16,7 +16,9 @@ Adafruit_SHT4x sht4 = Adafruit_SHT4x();
 // Graphics
 #include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
+
 TFT_eSprite centerText = TFT_eSprite(&tft);
+TFT_eSprite centerSubText = TFT_eSprite(&tft);
 
 // Touchscreen
 #include <CST816S.h>
@@ -37,7 +39,7 @@ void setup() {
   // Climate sensor
   SetupSHT41();
 
-  // Enable tft and sprite
+  // Enable draw and touch
   SetupLCD();
 
   // Enable wireless
@@ -60,7 +62,18 @@ void loop() {
   ArduinoOTA.handle();
   mqtt.loop();
 
-  // Motion detection, handle low power items and announce state via MQTT for home assistant functions
+  // Handle touch events - TODO orientation is not implemented yet
+  NavigationDebounce();
+
+  if (touch.available()) {
+    if (touchNavEnabled) {
+      selectedPage++;
+      if (selectedPage > maxPageNumber) { selectedPage = 0; }
+      displayUpdate = true;
+    }
+  }
+
+  // Motion detection, TODO handle low power items and announce state via MQTT for home assistant functions
   if (digitalRead(motionSensePin)) {
     analogWrite(BACKLIGHT, backlightLevel);
   } else {
@@ -68,12 +81,8 @@ void loop() {
   }
 
   // Page navigation
-  switch (selectedPage) {
-    case 0: 
-      DrawBlueRingPage();
-      break;
-  }
-
+  PageNavigation();
+  
   // Timed events - currently sensors and MQTT publishing
   unsigned long currentMillis = millis();
 
@@ -86,24 +95,65 @@ void loop() {
 
 // **************** Draw Functions - Pages **************** //
 
+void PageNavigation() {
+  switch (selectedPage) {
+    case 0: 
+      DrawBlueRingPage();
+      break;
+    case 1:
+      DrawGreenRingPage();
+      break;
+  }
+}
+
 void DrawBlueRingPage() {
   // Blue page with white outter ring and centered text elements
-  centerText.fillSprite(colorCalmBlue);
+  colorBackground = colorCalmBlue;
+  colorText = colorWhite;
 
-  // Ring is static so tft is fine
-  tft.drawArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, TFT_WHITE, TFT_WHITE);
+  if (displayUpdate) {
+    displayUpdate = false;
 
-  centerText.setTextColor(TFT_WHITE, colorCalmBlue);
-  centerText.setTextDatum(MC_DATUM);
+    tft.fillScreen(colorCalmBlue);
 
-  centerText.loadFont(cenGoth60);
-  centerText.drawString(currentTemperature + "°", centerText.width() / 2, centerText.height() / 2);
-  centerText.unloadFont();
-  centerText.loadFont(cenGoth24);
-  centerText.drawString(currentHumidity + "%", centerText.width() / 2, (centerText.height() / 2) + 40);
-  centerText.unloadFont();
+    tft.drawArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, colorWhite, colorWhite);
+  }
+  
+  drawCenteredTextSprite(centerText, currentTemperature + "°", cenGoth60, 40, 90, MC_DATUM);
 
-  centerText.pushSprite(43, 54);
+  drawCenteredTextSprite(centerSubText, currentHumidity + "%", cenGoth24, 80, 150, MC_DATUM);
+}
+
+void DrawGreenRingPage() {
+  // Green page with white outter ring and centered text elements
+  colorBackground = colorMossGreen;
+  colorText = colorWhite;
+
+  if (displayUpdate) {
+    displayUpdate = false;
+
+    tft.fillScreen(colorMossGreen);
+
+    tft.drawArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, colorWhite, colorWhite);
+  }
+
+  drawCenteredTextSprite(centerText, currentTemperature + "°", cenGoth60, 40, 90, MC_DATUM);
+
+  drawCenteredTextSprite(centerSubText, currentHumidity + "%", cenGoth24, 80, 150, MC_DATUM);
+}
+
+// **************** Draw Functions - Helpers **************** //
+
+void drawCenteredTextSprite(TFT_eSprite &sprite, const String &text, const uint8_t* font, int x, int y, uint8_t textDatum) {
+  sprite.fillSprite(colorBackground);
+  sprite.setTextColor(colorText, colorBackground);
+  sprite.setTextDatum(textDatum);
+
+  sprite.loadFont(font);
+  sprite.drawString(text, sprite.width() / 2, sprite.height() / 2);
+  sprite.unloadFont();
+
+  sprite.pushSprite(x, y);
 }
 
 // **************** Sensor Functions **************** //
@@ -246,10 +296,31 @@ void SetupLCD() {
   tft.setSwapBytes(true);
   tft.fillScreen(colorCalmBlue);
 
-  if (!centerText.createSprite(160, 130)) { Serial.println("Sprite (centerText) creation failed!"); }
+  if (!centerText.createSprite(160, 60)) { Serial.println("Sprite (centerText) creation failed!"); }
   centerText.fillSprite(colorCalmBlue);
+
+  if (!centerSubText.createSprite(80, 25)) { Serial.println("Sprite (centerSubText) creation failed!"); }
+  centerSubText.fillSprite(colorCalmBlue);
 
   analogWrite(BACKLIGHT, backlightLevel);
 
   touch.begin();
+}
+
+void NavigationDebounce() {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillisTouchEvent >= touchNavigationDebounceTime) {
+    previousMillisTouchEvent = currentMillis;
+
+    if (touchNavDebounce) {
+      touchNavEnabled = true;
+    } else {
+      touchNavEnabled = false;
+      if (touch.available()) {}
+    }
+
+    touchNavDebounce = !touchNavDebounce;
+  }
+
 }
