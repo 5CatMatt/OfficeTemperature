@@ -19,6 +19,7 @@ TFT_eSPI tft = TFT_eSPI();
 
 TFT_eSprite centerText = TFT_eSprite(&tft);
 TFT_eSprite centerSubText = TFT_eSprite(&tft);
+TFT_eSprite upperSubText = TFT_eSprite(&tft);
 
 // Touchscreen
 #include <CST816S.h>
@@ -55,6 +56,12 @@ void setup() {
 
   // Start MQTT as client
   mqtt.begin();
+
+  mqtt.subscribe("Outside Temperature", [](const String& topic, const String& payload) {
+    if (topic == "Outside Temperature") {
+      currentDownstairsTemp = payload;
+    }
+  });
 }
 
 void loop() {
@@ -70,6 +77,7 @@ void loop() {
       selectedPage++;
       if (selectedPage > maxPageNumber) { selectedPage = 0; }
       displayUpdate = true;
+      touchNavEnabled = false;
     }
   }
 
@@ -122,6 +130,8 @@ void DrawBlueRingPage() {
   drawCenteredTextSprite(centerText, currentTemperature + "°", cenGoth60, 40, 90, MC_DATUM);
 
   drawCenteredTextSprite(centerSubText, currentHumidity + "%", cenGoth24, 80, 150, MC_DATUM);
+
+  drawCenteredTextSprite(upperSubText, currentDownstairsTemp + "°", cenGoth24, 80, 30, MC_DATUM);
 }
 
 void DrawGreenRingPage() {
@@ -234,6 +244,10 @@ void SetupSHT41() {
 
 // **************** Network Functions **************** //
 
+void SubscribeMQTT() {
+
+}
+
 void PublishMQTT() {
   if (mqtt.connected()) {
     mqtt.publish(TOPIC_BATTERY, batteryVoltage.c_str());
@@ -301,6 +315,9 @@ void SetupLCD() {
 
   if (!centerSubText.createSprite(80, 25)) { Serial.println("Sprite (centerSubText) creation failed!"); }
   centerSubText.fillSprite(colorCalmBlue);
+
+  if (!upperSubText.createSprite(80, 25)) { Serial.println("Sprite (upperSubText) creation failed!"); }
+  upperSubText.fillSprite(colorCalmBlue);
 
   analogWrite(BACKLIGHT, backlightLevel);
 

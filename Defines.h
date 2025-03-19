@@ -45,7 +45,7 @@ const long sensorCheckInterval = 5000;
 bool touchNavDebounce = false;
 bool touchNavEnabled = false;
 unsigned long previousMillisTouchEvent = 0;
-uint16_t touchNavigationDebounceTime = 550;
+uint16_t touchNavigationDebounceTime = 150;
 
 // Battery level items
 const float R1 = 100000.0; // 100k ohms resistor divider
@@ -59,6 +59,7 @@ const float calibrationFactor = 1.101; // Adjust this factor to calibrate the me
 String batteryVoltage = "V";
 String currentTemperature = "T";
 String currentHumidity = "H";
+String currentDownstairsTemp = "D";
 float currentTemperatureValue = 0.0;
 float currentHumidityValue = 0.0;
 
