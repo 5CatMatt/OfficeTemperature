@@ -9,9 +9,10 @@
 // Pages to display, creates navigation via switch
 const uint8_t pageBlueRing = 0;
 const uint8_t pageGreenRing = 1;
+const uint8_t pageGreen = 2;
 
 uint8_t selectedPage = pageBlueRing;
-uint8_t maxPageNumber = 1;
+uint8_t maxPageNumber = 2;
 bool displayUpdate = true;  // Only draw the entire tft when the page needs to be wiped
 
 // LCD colors

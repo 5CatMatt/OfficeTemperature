@@ -113,6 +113,9 @@ void PageNavigation() {
     case 1:
       DrawGreenRingPage();
       break;
+    case 2:
+      DrawGreenPage();
+      break;
   }
 }
 
@@ -152,6 +155,11 @@ void DrawGreenRingPage() {
   drawCenteredTextSprite(centerText, currentTemperature + "°", cenGoth60, 40, 90, MC_DATUM);
 
   drawCenteredTextSprite(centerSubText, currentHumidity + "%", cenGoth24, 80, 150, MC_DATUM);
+}
+
+void DrawGreenPage() {
+  // Green page
+  tft.fillScreen(colorMossGreen);
 }
 
 // **************** Draw Functions - Helpers **************** //
