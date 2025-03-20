@@ -84,8 +84,10 @@ void loop() {
   // Motion detection, TODO handle low power items and announce state via MQTT for home assistant functions
   if (digitalRead(motionSensePin)) {
     analogWrite(BACKLIGHT, backlightLevel);
+    officeLightControl = "true";
   } else {
     analogWrite(BACKLIGHT, 0);
+    officeLightControl = "false";
   }
 
   // Page navigation
@@ -253,6 +255,7 @@ void PublishMQTT() {
     mqtt.publish(TOPIC_BATTERY, batteryVoltage.c_str());
     mqtt.publish(TOPIC_TEMPERATURE, currentTemperature.c_str());
     mqtt.publish(TOPIC_HUMIDITY, currentHumidity.c_str());
+    mqtt.publish(TOPIC_MOTION, officeLightControl.c_str());
   } else {
     // Just keep going, MQTT failed but will reconnect automatically
     Serial.println("MQTT not connected.");

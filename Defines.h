@@ -62,4 +62,5 @@ String currentHumidity = "H";
 String currentDownstairsTemp = "D";
 float currentTemperatureValue = 0.0;
 float currentHumidityValue = 0.0;
+String officeLightControl = "false";
 
