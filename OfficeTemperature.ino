@@ -121,12 +121,13 @@ void PageNavigation() {
       DrawGreenPage();
       break;
     case pageCasico:
-      currentCasicoDrawMillis = millis();
-      if (currentCasicoDrawMillis - previousCasicoDrawMillis >= casicoDrawInterval) {
-        previousCasicoDrawMillis = currentCasicoDrawMillis;
+      // currentCasicoDrawMillis = millis();
+      // if (currentCasicoDrawMillis - previousCasicoDrawMillis >= casicoDrawInterval) {
+      //   previousCasicoDrawMillis = currentCasicoDrawMillis;
     
-        DrawCasicoPage();
-      }      
+      //   DrawCasicoPage();
+      // }    
+      DrawCasicoPage();  
       break;
   }
 }
@@ -141,7 +142,7 @@ void DrawBlueRingPage() {
 
     tft.fillScreen(colorCalmBlue);
 
-    tft.drawArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, colorWhite, colorWhite);
+    tft.drawSmoothArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, colorWhite, colorBackground);
   }
   
   drawCenteredTextSprite(centerText, currentTemperature + "°", CenturyGothic60, 40, 90, MC_DATUM);
@@ -161,7 +162,7 @@ void DrawGreenRingPage() {
 
     tft.fillScreen(colorMossGreen);
 
-    tft.drawArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, colorWhite, colorWhite);
+    tft.drawSmoothArc(centerX, centerY, maxRadius, maxRadius - ringWidth, 0, 360, colorWhite, colorBackground);
   }
 
   drawCenteredTextSprite(centerText, currentTemperature + "°", CenturyGothic60, 40, 90, MC_DATUM);
@@ -200,40 +201,61 @@ void DrawCasicoPage() {
     tft.pushImage(32, 133, 13, 50, casicoArea6);
 
     tft.pushImage(146, 60, 63, 63, casicoCircle);
+
     tft.pushImage(32, 60, 74, 5, casicoSquare1);
     tft.pushImage(102, 65, 4, 45, casicoSquare2);
     tft.pushImage(32, 65, 4, 45, casicoSquare3);
     tft.pushImage(36, 106, 66, 4, casicoSquare4);
+
+    // Main body polygon
+    tft.fillRect(50, 133, 135, 59, colorCasioGrey);
+    tft.fillRect(45, 133, 5, 50, colorCasioGrey);
+    tft.fillRect(49, 183, 1, 9, colorCasioGrey);
+    tft.fillRect(185, 134, 1, 58, colorCasioGrey);
+
+    // Temperature rectange
+    tft.fillRect(36, 65, 66, 41, colorCasioGrey);
     
   }
 
-  // Main body polygon
-  tft.fillRect(50, 133, 135, 59, colorCasioGrey);
-  tft.fillRect(45, 133, 5, 50, colorCasioGrey);
-  tft.fillRect(49, 183, 1, 9, colorCasioGrey);
-  tft.fillRect(185, 134, 1, 58, colorCasioGrey);
+  // Main body polygon - TODO this is too large and can be better centered
+  casicoMainBody.fillSprite(colorCasioGrey);
+
+  casicoMainBody.setTextDatum(MC_DATUM);
+  casicoMainBody.loadFont(Segment34);
+  casicoMainBody.setTextColor(colorBlack, colorBlack);
+  casicoMainBody.drawString("Monday", casicoMainBody.width() / 2, casicoMainBody.height() / 2);
+  casicoMainBody.unloadFont();
 
   // Temperature rectange
-  tft.fillRect(36, 65, 66, 41, colorCasioGrey);
+  casicoTempRect.fillSprite(colorCasioGrey);
 
-  tft.loadFont(Segment34);
-  tft.setTextColor(colorBlack, colorBlack);
-  tft.drawString("69.4", 45, 73);
-  tft.unloadFont();
+  casicoTempRect.setTextDatum(MC_DATUM);
+  casicoTempRect.loadFont(Segment34);
+  casicoTempRect.setTextColor(colorBlack, colorBlack);
+  casicoTempRect.drawString(currentTemperature, casicoTempRect.width() / 2, casicoTempRect.height() / 2);
+  casicoTempRect.unloadFont();
 
   // Humidity circle
-  tft.fillCircle(177, 92, 26, colorCasioGrey);
+  casicoHumCircle.fillSprite(colorCasioGrey);
+
+  casicoHumCircle.setTextDatum(MC_DATUM);
+  casicoHumCircle.loadFont(Segment24);
+  casicoHumCircle.setTextColor(colorBlack, colorBlack);
+  casicoHumCircle.drawString(String(currentHumidityValue, 0), casicoHumCircle.width() / 2, casicoHumCircle.height() / 2);
+  casicoHumCircle.unloadFont();
 
   int humidityFillValue = map(currentHumidityValue, 0, 100, 0, 360);
-  tft.drawSmoothArc(177, 92, 23, 19, 0, humidityFillValue, colorCasioDarkRing, colorCasioGrey);
+  tft.drawArc(177, 92, 26, 22, 2, humidityFillValue, colorLightBlue, colorCasioGrey);
+  tft.drawArc(177, 92, 26, 22, humidityFillValue, 363, colorCasioDarkBG, colorCasioGrey);
 
-  tft.loadFont(Segment24);
-  tft.setTextColor(colorBlack, colorBlack);
-  tft.drawString("22", 166, 82);
+  // int humidityFillValue = map(currentHumidityValue, 0, 100, 0, 360);
+  // tft.drawArc(177, 92, 26, 22, 2, humidityFillValue + 2, colorLightBlue, colorCasioGrey); // Slightly overlap
+  // tft.drawArc(177, 92, 26, 22, humidityFillValue, 363, colorCasioDarkBG, colorCasioGrey);
 
-  // casicoMainBody.pushSprite(39, 123);
-  // casicoTempRect.pushSprite(37, 69);
-  // casicoHumCircle.pushSprite(149, 62);
+  casicoMainBody.pushSprite(60, 134);
+  casicoTempRect.pushSprite(36, 70);
+  casicoHumCircle.pushSprite(160, 80);
 
 }
 
@@ -405,13 +427,13 @@ void SetupLCD() {
   if (!upperSubText.createSprite(80, 25)) { Serial.println("Sprite (upperSubText) creation failed!"); }
   upperSubText.fillSprite(colorCalmBlue);
 
-  if (!casicoTempRect.createSprite(63, 32)) { Serial.println("Sprite (casicoTempRect) creation failed!"); }
-  casicoTempRect.fillSprite(colorCasioGrey);
+  if (!casicoTempRect.createSprite(66, 30)) { Serial.println("Sprite (casicoTempRect) creation failed!"); }
+  casicoTempRect.fillSprite(colorCalmBlue);
 
-  if (!casicoHumCircle.createSprite(57, 58)) { Serial.println("Sprite (casicoHumCircle) creation failed!"); }
+  if (!casicoHumCircle.createSprite(35, 25)) { Serial.println("Sprite (casicoHumCircle) creation failed!"); }
   casicoHumCircle.fillSprite(colorCalmBlue);
 
-  if (!casicoMainBody.createSprite(157, 75)) { Serial.println("Sprite (casicoMainBody) creation failed!"); }
+  if (!casicoMainBody.createSprite(124, 28)) { Serial.println("Sprite (casicoMainBody) creation failed!"); }
   casicoMainBody.fillSprite(colorCalmBlue);
 
   analogWrite(BACKLIGHT, backlightLevel);
