@@ -1,5 +1,32 @@
-#include <century_gothic_60.h>
-#include <century_24.h>
+#include <CenturyGothic24.h>
+#include <CenturyGothic60.h>
+#include <AlarmClock60.h> // no special chars, only nums
+#include <Segment760.h> // all chars but not very close to old watch
+#include <DigitalDisplayRegular60.h> // no special chars, only nums
+#include <DigitalDisplayRegular76.h>
+#include <Segment76.h>
+#include <Segment34.h>
+#include <Segment24.h>
+
+#include <CasicoLogo.h>
+#include <CasicoDegrees.h>
+
+#include <casicoBlueLogo.h>
+#include <casicoSubLogo.h>
+#include <casicoTemp.h>
+#include <casicoHum.h>
+#include <casicoArea1.h>
+#include <casicoArea2.h>
+#include <casicoArea3.h>
+#include <casicoArea4.h>
+#include <casicoArea5.h>
+#include <casicoArea6.h>
+
+#include <casicoCircle.h>
+#include <casicoSquare1.h>
+#include <casicoSquare2.h>
+#include <casicoSquare3.h>
+#include <casicoSquare4.h>
 
 #define SDA 23
 #define SCL 22
@@ -10,9 +37,10 @@
 const uint8_t pageBlueRing = 0;
 const uint8_t pageGreenRing = 1;
 const uint8_t pageGreen = 2;
+const uint8_t pageCasico = 3;
 
-uint8_t selectedPage = pageBlueRing;
-uint8_t maxPageNumber = 2;
+uint8_t selectedPage = pageCasico;
+uint8_t maxPageNumber = 3;
 bool displayUpdate = true;  // Only draw the entire tft when the page needs to be wiped
 
 // LCD colors
@@ -21,6 +49,11 @@ const uint16_t colorLightBlue = 0x3BDB;
 const uint16_t colorMossGreen = 0x4B28;
 const uint16_t colorWhite = 0xFFFF;
 const uint16_t colorBlack = 0x0000;
+const uint16_t colorCasioGrey = 0xA553;
+const uint16_t colorCasioDarkRing = 0x18E4;
+const uint16_t colorCasioDarkBG = 0x424A;
+const uint16_t colorCasioInnerBorder = 0x5AEB;
+const uint16_t colorCasioOutterBorder = 0x2966;
 
 uint16_t colorBackground = colorCalmBlue;
 uint16_t colorText = colorWhite;
@@ -41,6 +74,11 @@ const uint16_t backlightLevel = 255;    // Pin defined in tft_espi library
 // Timer for sensor updates
 unsigned long previousTimeCheckMillis = 0;
 const long sensorCheckInterval = 5000;
+
+// Timer for casico tft page updates
+unsigned long currentCasicoDrawMillis = 0;
+unsigned long previousCasicoDrawMillis = 0;
+const long casicoDrawInterval = 1000;
 
 // Touchscreen items - slow down response to limit multitouch events
 bool touchNavDebounce = false;
