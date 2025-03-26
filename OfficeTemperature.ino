@@ -24,6 +24,9 @@ TFT_eSprite upperSubText = TFT_eSprite(&tft);
 TFT_eSprite casicoTempRect = TFT_eSprite(&tft);
 TFT_eSprite casicoHumCircle = TFT_eSprite(&tft);
 TFT_eSprite casicoMainBody = TFT_eSprite(&tft);
+TFT_eSprite casicoMainBodyTop = TFT_eSprite(&tft);
+TFT_eSprite casicoMainBodyLeft = TFT_eSprite(&tft);
+TFT_eSprite casicoMainBodyRight = TFT_eSprite(&tft);
 
 // Touchscreen
 #include <CST816S.h>
@@ -218,44 +221,27 @@ void DrawCasicoPage() {
     
   }
 
-  // Main body polygon - TODO this is too large and can be better centered
-  casicoMainBody.fillSprite(colorCasioGrey);
+  colorBackground = colorCalmBlue;
+  colorText = colorCasioDarkBG;
 
-  casicoMainBody.setTextDatum(MC_DATUM);
-  casicoMainBody.loadFont(Segment34);
-  casicoMainBody.setTextColor(colorBlack, colorBlack);
-  casicoMainBody.drawString("Monday", casicoMainBody.width() / 2, casicoMainBody.height() / 2);
-  casicoMainBody.unloadFont();
+  // Main body polygon - time of day
+  drawCenteredTextSprite(casicoMainBody, "1:34", Segment755, 56, 154, MC_DATUM);
+
+  drawCenteredTextSprite(casicoMainBodyTop, "Monday", CenturyGothic24, 58, 125, MC_DATUM);
+
+  drawCenteredTextSprite(casicoMainBodyLeft, "F", CenturyGothic24, 38, 140, MC_DATUM);
+
+  drawCenteredTextSprite(casicoMainBodyRight, "A", CenturyGothic24, 182, 147, MC_DATUM);
 
   // Temperature rectange
-  casicoTempRect.fillSprite(colorCasioGrey);
-
-  casicoTempRect.setTextDatum(MC_DATUM);
-  casicoTempRect.loadFont(Segment34);
-  casicoTempRect.setTextColor(colorBlack, colorBlack);
-  casicoTempRect.drawString(currentTemperature, casicoTempRect.width() / 2, casicoTempRect.height() / 2);
-  casicoTempRect.unloadFont();
+  drawCenteredTextSprite(casicoTempRect, currentTemperature, Segment34, 36, 70, MC_DATUM);
 
   // Humidity circle
-  casicoHumCircle.fillSprite(colorCasioGrey);
-
-  casicoHumCircle.setTextDatum(MC_DATUM);
-  casicoHumCircle.loadFont(Segment24);
-  casicoHumCircle.setTextColor(colorBlack, colorBlack);
-  casicoHumCircle.drawString(String(currentHumidityValue, 0), casicoHumCircle.width() / 2, casicoHumCircle.height() / 2);
-  casicoHumCircle.unloadFont();
+  drawCenteredTextSprite(casicoHumCircle, String(currentHumidityValue, 0), Segment24, 160, 80, MC_DATUM);
 
   int humidityFillValue = map(currentHumidityValue, 0, 100, 0, 360);
   tft.drawArc(177, 92, 26, 22, 2, humidityFillValue, colorLightBlue, colorCasioGrey);
   tft.drawArc(177, 92, 26, 22, humidityFillValue, 363, colorCasioDarkBG, colorCasioGrey);
-
-  // int humidityFillValue = map(currentHumidityValue, 0, 100, 0, 360);
-  // tft.drawArc(177, 92, 26, 22, 2, humidityFillValue + 2, colorLightBlue, colorCasioGrey); // Slightly overlap
-  // tft.drawArc(177, 92, 26, 22, humidityFillValue, 363, colorCasioDarkBG, colorCasioGrey);
-
-  casicoMainBody.pushSprite(60, 134);
-  casicoTempRect.pushSprite(36, 70);
-  casicoHumCircle.pushSprite(160, 80);
 
 }
 
@@ -411,34 +397,46 @@ void SetupOTA() {
 // **************** User Interface Functions **************** //
 
 void SetupLCD() {
-  // Configure LCD initial state, tft can be used if the page is static, sprite should be used for dynamic objects
+  // Configure LCD initial state, tft can be used if the element is static, sprite should be used for dynamic objects
   // NOTE full screen sprite is not possible, memory will overflow without error. If the sprite can't create memory is the cause
   tft.init();
   tft.setRotation(3);
   tft.setSwapBytes(true);
   tft.fillScreen(colorCalmBlue);
 
-  if (!centerText.createSprite(160, 60)) { Serial.println("Sprite (centerText) creation failed!"); }
-  centerText.fillSprite(colorCalmBlue);
+  // This will dump creation errors to the serial port
+  CreateAndFillSprite(centerText, 160, 60, colorCalmBlue, "centerText");
 
-  if (!centerSubText.createSprite(80, 25)) { Serial.println("Sprite (centerSubText) creation failed!"); }
-  centerSubText.fillSprite(colorCalmBlue);
+  CreateAndFillSprite(centerSubText, 80, 25, colorCalmBlue, "centerSubText");
 
-  if (!upperSubText.createSprite(80, 25)) { Serial.println("Sprite (upperSubText) creation failed!"); }
-  upperSubText.fillSprite(colorCalmBlue);
+  CreateAndFillSprite(upperSubText, 80, 25, colorCalmBlue, "upperSubText");
 
-  if (!casicoTempRect.createSprite(66, 30)) { Serial.println("Sprite (casicoTempRect) creation failed!"); }
-  casicoTempRect.fillSprite(colorCalmBlue);
+  CreateAndFillSprite(casicoTempRect, 66, 30, colorCasioGrey, "casicoTempRect");
 
-  if (!casicoHumCircle.createSprite(35, 25)) { Serial.println("Sprite (casicoHumCircle) creation failed!"); }
-  casicoHumCircle.fillSprite(colorCalmBlue);
+  CreateAndFillSprite(casicoHumCircle, 35, 25, colorCasioGrey, "casicoHumCircle");
 
-  if (!casicoMainBody.createSprite(124, 28)) { Serial.println("Sprite (casicoMainBody) creation failed!"); }
-  casicoMainBody.fillSprite(colorCalmBlue);
+  CreateAndFillSprite(casicoMainBody, 126, 44, colorCasioGrey, "casicoMainBody");
 
+  CreateAndFillSprite(casicoMainBodyTop, 90, 28, colorCasioGrey, "casicoMainBodyTop");
+
+  CreateAndFillSprite(casicoMainBodyLeft, 17, 40, colorCasioGrey, "casicoMainBodyLeft");
+
+  CreateAndFillSprite(casicoMainBodyRight, 15, 37, colorCasioGrey, "casicoMainBodyRight");
+
+  // Backlight is defined in the tft_espi library
   analogWrite(BACKLIGHT, backlightLevel);
 
   touch.begin();
+}
+
+void CreateAndFillSprite(TFT_eSprite &sprite, int width, int height, uint16_t fillColor, const String &spriteName) {
+  if (!sprite.createSprite(width, height)) {
+    Serial.print("Sprite (");
+    Serial.print(spriteName);
+    Serial.println(") creation failed!");
+  } else {
+    sprite.fillSprite(fillColor);
+  }
 }
 
 void NavigationDebounce() {

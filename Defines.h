@@ -1,12 +1,17 @@
 #include <CenturyGothic24.h>
 #include <CenturyGothic60.h>
 #include <AlarmClock60.h> // no special chars, only nums
+#include <AlarmClockRegular24.h>
+
+
 #include <Segment760.h> // all chars but not very close to old watch
 #include <DigitalDisplayRegular60.h> // no special chars, only nums
 #include <DigitalDisplayRegular76.h>
 #include <Segment76.h> // some special chars but poor small size
 #include <Segment34.h>
 #include <Segment24.h>
+#include <Segment755.h>
+#include <Segment769.h>
 
 #include <CasicoLogo.h>
 #include <CasicoDegrees.h>
