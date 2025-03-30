@@ -1,3 +1,20 @@
+/*
+
+Office status display
+
+Read and display temperature and humidity on a waveshare 1.8" round LCD with touch. 
+Detect occupancy via PIR sernsor. Connect to wifi and open MQTT serivce as a client
+to publish sensor data.
+
+Target microcontroller is an ESP-32-WROOM
+
+Battery voltage is available on hardware, TBD if battery will be used.
+
+Burn-in may be an issue, multiple display pages will be created and will cycle 
+automatically to lessen negative effect.
+
+*/
+
 #include <WiFi.h>
 #include <ArduinoOTA.h>
 #include <PicoMQTT.h>
