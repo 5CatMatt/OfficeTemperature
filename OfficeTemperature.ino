@@ -123,13 +123,7 @@ void PageNavigation() {
     case pageGreen:
       DrawGreenPage();
       break;
-    case pageCasico:
-      // currentCasicoDrawMillis = millis();
-      // if (currentCasicoDrawMillis - previousCasicoDrawMillis >= casicoDrawInterval) {
-      //   previousCasicoDrawMillis = currentCasicoDrawMillis;
-    
-      //   DrawCasicoPage();
-      // }    
+    case pageCasico:  
       DrawCasicoPage();  
       break;
   }
